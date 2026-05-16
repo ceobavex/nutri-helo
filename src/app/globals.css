@@ -127,4 +127,23 @@
   html {
     @apply font-sans;
   }
+  
+  /* FORÇA O CURSOR POINTER GLOBALMENTE */
+  button, 
+  a, 
+  [role="button"], 
+  [type="button"], 
+  [type="submit"],
+  select {
+    @apply cursor-pointer;
+  }
+
+  /* FORÇA O CURSOR DE BLOQUEADO PARA ELEMENTOS DESABILITADOS */
+  button:disabled, 
+  button[data-disabled],
+  a[aria-disabled="true"], 
+  [role="button"][aria-disabled="true"],
+  [data-disabled] {
+    @apply cursor-not-allowed opacity-50;
+  }
 }
