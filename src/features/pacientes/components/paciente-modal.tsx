@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useMemo, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { 
@@ -41,7 +41,6 @@ export function PacienteModal() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [idade, setIdade] = useState("");
 
   const form = useForm<PacienteFormValues>({
     resolver: zodResolver(pacienteSchema),
@@ -51,13 +50,14 @@ export function PacienteModal() {
     },
   });
 
-  const { watch, setValue, formState: { errors } } = form;
-  const dataNasc = watch("dataNascimento");
-  const sexoVal = watch("sexo");
-  const objPrincipal = watch("objetivoPrincipal");
-  const objsSecundarios = watch("objetivosSecundarios");
+  const { setValue, formState: { errors } } = form;
+  const nomeVal = useWatch({ control: form.control, name: "nome" });
+  const dataNasc = useWatch({ control: form.control, name: "dataNascimento" });
+  const sexoVal = useWatch({ control: form.control, name: "sexo" });
+  const objPrincipal = useWatch({ control: form.control, name: "objetivoPrincipal" });
+  const objsSecundarios = useWatch({ control: form.control, name: "objetivosSecundarios" }) ?? [];
 
-  useEffect(() => {
+  const idade = useMemo(() => {
     if (dataNasc && dataNasc.length === 10) {
       const birthDate = new Date(dataNasc);
       if (!isNaN(birthDate.getTime())) {
@@ -67,11 +67,11 @@ export function PacienteModal() {
         if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
           age--;
         }
-        setIdade(`${age} anos`);
+        return `${age} anos`;
       }
-    } else {
-      setIdade("");
     }
+    
+    return "";
   }, [dataNasc]);
 
   const toggleObjetivo = (objetivo: string) => {
@@ -94,7 +94,7 @@ export function PacienteModal() {
   const tornarPrincipal = (objetivo: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (objPrincipal === objetivo) return;
-    let novosSecundarios = [...objsSecundarios.filter(o => o !== objetivo)];
+    const novosSecundarios = [...objsSecundarios.filter(o => o !== objetivo)];
     if (objPrincipal) novosSecundarios.push(objPrincipal);
     setValue("objetivoPrincipal", objetivo);
     setValue("objetivosSecundarios", novosSecundarios);
@@ -252,7 +252,7 @@ export function PacienteModal() {
                 type="button" 
                 onClick={() => setStep(2)} 
                 className="w-full mt-8 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer h-12 shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/40 transition-all font-semibold text-base" 
-                disabled={!form.watch("nome") || !form.watch("dataNascimento") || !form.watch("sexo")}
+                disabled={!nomeVal || !dataNasc || !sexoVal}
               >
                 Avançar para Objetivos <ChevronRight className="w-5 h-5 ml-2" />
               </Button>

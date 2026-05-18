@@ -24,6 +24,7 @@ import {
   Plus,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
@@ -118,9 +119,12 @@ export default async function PacientePerfilPage({
 
             <div className="h-24 w-24 rounded-full overflow-hidden border-[4px] border-white dark:border-zinc-950 shadow-lg bg-emerald-50 dark:bg-emerald-950 flex items-center justify-center">
 
-              <img
+              <Image
                 src={avatarUrl}
                 alt={paciente.nome}
+                width={96}
+                height={96}
+                unoptimized
                 className="w-full h-full object-cover scale-110"
                 draggable={false}
               />
@@ -168,10 +172,10 @@ export default async function PacientePerfilPage({
 
               <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
                 <Phone className="w-4 h-4 text-zinc-400" />
-                {paciente.telefone.replace(
+                {paciente.telefone?.replace(
                   /(\d{2})(\d{5})(\d{4})/,
                   "($1) $2-$3"
-                )}
+                ) ?? "Telefone não informado"}
               </div>
 
               {paciente.email && (
@@ -413,9 +417,11 @@ export default async function PacientePerfilPage({
 
                   </div>
 
-                  <Button className="w-full mt-5 h-12 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg transition-all">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Iniciar Nova Consulta
+                  <Button asChild className="w-full mt-5 h-12 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg transition-all">
+                    <Link href={`/pacientes/${paciente.id}/consulta/nova`}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Iniciar Nova Consulta
+                    </Link>
                   </Button>
                 </div>
 

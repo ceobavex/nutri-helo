@@ -1,5 +1,5 @@
 // src/lib/supabase/server.ts
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
 export async function createClient() {
@@ -20,7 +20,7 @@ export async function createClient() {
             )
           } catch {
             // O `setAll` foi chamado de um Server Component.
-            // Isso pode ser ignorado se houver middleware manipulando a sessão.
+            // Isso pode ser ignorado se houver proxy manipulando a sessão.
           }
         },
       },

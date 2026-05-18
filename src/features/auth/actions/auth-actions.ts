@@ -3,6 +3,17 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
+
+const cadastroSchema = z.object({
+  nome: z.string().min(3),
+  cpf: z.string().min(11).max(14),
+  email: z.string().email(),
+  telefone: z.string().min(10),
+  crn: z.string().min(3),
+  regiao: z.string().min(1),
+  senha: z.string().min(6),
+});
 
 export async function loginAction(data: { crn: string; regiao: string; senha: string }) {
   const supabase = await createClient();
@@ -32,13 +43,20 @@ export async function loginAction(data: { crn: string; regiao: string; senha: st
   return { success: true };
 }
 
-export async function cadastroAction(data: any) {
+export async function cadastroAction(data: z.infer<typeof cadastroSchema>) {
   const supabase = await createClient();
+  const parsed = cadastroSchema.safeParse(data);
+
+  if (!parsed.success) {
+    return { error: "Revise os dados do cadastro antes de continuar." };
+  }
+
+  const cadastro = parsed.data;
 
   // 1. Cria o usuário no sistema de Autenticação do Supabase
   const { data: authData, error: authError } = await supabase.auth.signUp({
-    email: data.email,
-    password: data.senha,
+    email: cadastro.email,
+    password: cadastro.senha,
   });
 
   if (authError) {
@@ -53,12 +71,12 @@ export async function cadastroAction(data: any) {
   // 2. Salva os dados na tabela pública de nutricionistas
   const { error: dbError } = await supabase.from("nutricionistas").insert({
     id: authData.user.id,
-    nome: data.nome,
-    cpf: data.cpf,
-    email: data.email,
-    telefone: data.telefone,
-    crn: data.crn,
-    regiao: data.regiao,
+    nome: cadastro.nome,
+    cpf: cadastro.cpf,
+    email: cadastro.email,
+    telefone: cadastro.telefone,
+    crn: cadastro.crn,
+    regiao: cadastro.regiao,
     tipo_inscricao: "Pendente", // Valor padrão pois removemos do form
   });
 

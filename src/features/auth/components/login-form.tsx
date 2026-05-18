@@ -44,7 +44,7 @@ export function LoginForm() {
       setIsLoading(false);
     } else {
       toast.success("Bem-vindo(a)!", { description: "Acesso autorizado com sucesso." });
-      router.push("/dashboard"); 
+      router.push("/");
     }
   }
 

@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nutri Helo
 
-## Getting Started
+Sistema clínico para nutricionistas, com autenticação por CRN, cadastro de pacientes, prontuário e atendimento com anamnese dinâmica.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js 16, App Router e React 19
+- Supabase Auth, Postgres e Row Level Security
+- Tailwind CSS 4 e componentes shadcn/radix
+- React Hook Form e Zod
+
+## Fluxo Principal
+
+1. A nutricionista acessa o sistema com CRN, região e senha.
+2. O app resolve o e-mail pelo RPC `get_email_por_crn` no Supabase.
+3. Pacientes são cadastrados com dados básicos e objetivos nutricionais.
+4. O prontuário reúne visão geral, anamnese, evolução, dietas, consultas e exames.
+5. Ao iniciar consulta, o sistema cria ou retoma um rascunho em `consultas`.
+6. A anamnese é renderizada por schema versionado e salva automaticamente em `dados_clinicos`.
+
+## Variáveis de Ambiente
+
+Crie um `.env.local` com:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Supabase
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+As migrations ficam em `supabase/migrations`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `20260518000000_base_schema.sql`: cria tabelas, triggers, RPC de login por CRN e policies base.
+- `20260518001000_consultas_rls.sql`: libera a criação e atualização de rascunhos da tabela `consultas` apenas para a nutricionista dona do paciente.
 
-## Learn More
+## Desenvolvimento
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Abra `http://localhost:3000`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Qualidade
 
-## Deploy on Vercel
+```bash
+npm run lint
+npm run typegen
+npm run typecheck
+npm run build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Sempre rode `npm run typegen` depois de mudanças relevantes em rotas do App Router.

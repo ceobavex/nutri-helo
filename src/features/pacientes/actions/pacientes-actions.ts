@@ -50,7 +50,7 @@ export async function cadastrarPaciente(data: PacienteFormValues) {
     revalidatePath("/");
     
     return { success: true, paciente };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Erro interno:", err);
     return { error: "Ocorreu um erro inesperado ao processar o cadastro." };
   }

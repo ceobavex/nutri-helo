@@ -31,6 +31,7 @@ const cadastroSchema = z.object({
 });
 
 type CadastroFormValues = z.infer<typeof cadastroSchema>;
+type CadastroFieldName = keyof CadastroFormValues;
 
 const inputClasses = "rounded-full h-12 border-zinc-200 flex w-full border bg-transparent px-4 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500 disabled:opacity-50";
 const selectTriggerClasses = "rounded-full h-12 border-zinc-200 disabled:opacity-50";
@@ -49,7 +50,7 @@ export function CadastroForm() {
   const regioesCRN = Array.from({ length: 11 }, (_, i) => `CRN-${i + 1}`);
 
   async function nextStep() {
-    let fieldsToValidate: any[] = [];
+    let fieldsToValidate: CadastroFieldName[] = [];
     if (step === 1) fieldsToValidate = ["nome", "cpf", "email", "telefone"];
     if (step === 2) fieldsToValidate = ["crn", "regiao"];
 
@@ -68,7 +69,7 @@ export function CadastroForm() {
       setIsLoading(false);
     } else {
       toast.success("Conta criada!", { description: "Bem-vindo(a) ao Nutri Helo." });
-      router.push("/dashboard");
+      router.push("/");
     }
   }
 
